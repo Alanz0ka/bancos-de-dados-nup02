@@ -2,7 +2,10 @@ package cadastroprodutos;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * DAO (Data Access Object) com as operacoes de acesso a tabela "produto".
@@ -61,5 +64,52 @@ public class ProdutoDAO {
         } finally {
             Conexao.fechar(conexao);
         }
+    }
+
+    /** READ -- lista todos os produtos cadastrados (Aula 09 - SELECT). */
+    public List<Produto> listar() {
+        String sql = "SELECT id, nome, preco, quantidade, categoria FROM produto ORDER BY id";
+        List<Produto> produtos = new ArrayList<>();
+        Connection conexao = Conexao.conectar();
+        try (PreparedStatement ps = conexao.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                produtos.add(new Produto(
+                        rs.getInt("id"),
+                        rs.getString("nome"),
+                        rs.getDouble("preco"),
+                        rs.getInt("quantidade"),
+                        rs.getString("categoria")));
+            }
+        } catch (SQLException e) {
+            System.out.println("Erro ao listar produtos: " + e.getMessage());
+        } finally {
+            Conexao.fechar(conexao);
+        }
+        return produtos;
+    }
+
+    /** READ -- busca um produto pelo id (auxiliar para alterar/remover). */
+    public Produto buscarPorId(int id) {
+        String sql = "SELECT id, nome, preco, quantidade, categoria FROM produto WHERE id = ?";
+        Connection conexao = Conexao.conectar();
+        try (PreparedStatement ps = conexao.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return new Produto(
+                            rs.getInt("id"),
+                            rs.getString("nome"),
+                            rs.getDouble("preco"),
+                            rs.getInt("quantidade"),
+                            rs.getString("categoria"));
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Erro ao buscar produto: " + e.getMessage());
+        } finally {
+            Conexao.fechar(conexao);
+        }
+        return null;
     }
 }
