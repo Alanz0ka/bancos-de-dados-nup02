@@ -43,4 +43,23 @@ public class ProdutoDAO {
             Conexao.fechar(conexao);
         }
     }
+
+    /** UPDATE -- altera um produto existente (Aula 08). */
+    public boolean alterar(Produto produto) {
+        String sql = "UPDATE produto SET nome = ?, preco = ?, quantidade = ?, categoria = ? WHERE id = ?";
+        Connection conexao = Conexao.conectar();
+        try (PreparedStatement ps = conexao.prepareStatement(sql)) {
+            ps.setString(1, produto.getNome());
+            ps.setDouble(2, produto.getPreco());
+            ps.setInt(3, produto.getQuantidade());
+            ps.setString(4, produto.getCategoria());
+            ps.setInt(5, produto.getId());
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.out.println("Erro ao alterar produto: " + e.getMessage());
+            return false;
+        } finally {
+            Conexao.fechar(conexao);
+        }
+    }
 }
