@@ -28,4 +28,19 @@ public class ProdutoDAO {
             Conexao.fechar(conexao);
         }
     }
+
+    /** DELETE -- remove um produto pelo id (Aula 07). */
+    public boolean remover(int id) {
+        String sql = "DELETE FROM produto WHERE id = ?";
+        Connection conexao = Conexao.conectar();
+        try (PreparedStatement ps = conexao.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.out.println("Erro ao remover produto: " + e.getMessage());
+            return false;
+        } finally {
+            Conexao.fechar(conexao);
+        }
+    }
 }
