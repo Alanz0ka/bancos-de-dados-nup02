@@ -1,0 +1,12 @@
+# Saida de compilacao
+/out/
+/build/
+*.class
+
+# Configuracao local de conexao (contem senha) -- nao versionar
+config.properties
+
+# IDE / Sistema operacional
+.idea/
+*.iws
+.DS_Store
