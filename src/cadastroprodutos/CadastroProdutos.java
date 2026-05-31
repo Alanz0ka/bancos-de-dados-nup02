@@ -32,6 +32,9 @@ public class CadastroProdutos {
                 case 2 -> listar();
                 case 3 -> alterar();
                 case 4 -> remover();
+                case 5 -> buscarPorNome();
+                case 6 -> listarOrdenado();
+                case 7 -> relatorioEstoque();
                 case 0 -> System.out.println("\nEncerrando... ate mais!");
                 default -> System.out.println("\n[!] Opcao invalida. Tente novamente.");
             }
@@ -46,6 +49,9 @@ public class CadastroProdutos {
         System.out.println("2 - Listar produtos");
         System.out.println("3 - Alterar produto");
         System.out.println("4 - Remover produto");
+        System.out.println("5 - Buscar produto por nome");
+        System.out.println("6 - Listar produtos (ordenado)");
+        System.out.println("7 - Relatorio de estoque");
         System.out.println("0 - Sair");
         System.out.println("------------------------");
     }
@@ -133,6 +139,65 @@ public class CadastroProdutos {
         } else {
             System.out.println("Remocao cancelada.");
         }
+    }
+
+    /** Opcao 5 - EXTRA: buscar produtos por nome. */
+    private static void buscarPorNome() {
+        System.out.println();
+        System.out.println(">> BUSCAR PRODUTO POR NOME");
+        String termo = lerTexto("Digite parte do nome: ");
+        List<Produto> produtos = DAO.buscarPorNome(termo);
+        if (produtos.isEmpty()) {
+            System.out.println("(nenhum produto encontrado para \"" + termo + "\")");
+            return;
+        }
+        System.out.println("-------------------------------------------------------------------");
+        for (Produto p : produtos) {
+            System.out.println(p);
+        }
+        System.out.println("-------------------------------------------------------------------");
+        System.out.println("Encontrado(s): " + produtos.size() + " produto(s).");
+    }
+
+    /** Opcao 6 - EXTRA: listar produtos com ordenacao escolhida. */
+    private static void listarOrdenado() {
+        System.out.println();
+        System.out.println(">> LISTAR PRODUTOS (ORDENADO)");
+        System.out.println("Ordenar por: 1-Nome  2-Preco  3-Quantidade");
+        int op = lerInteiro("Opcao: ");
+        String coluna = switch (op) {
+            case 1 -> "nome";
+            case 2 -> "preco";
+            case 3 -> "quantidade";
+            default -> "id";
+        };
+        String dir = lerTexto("Direcao (C=crescente / D=decrescente): ");
+        boolean crescente = !dir.equalsIgnoreCase("D");
+
+        List<Produto> produtos = DAO.listarOrdenado(coluna, crescente);
+        if (produtos.isEmpty()) {
+            System.out.println("(nenhum produto cadastrado)");
+            return;
+        }
+        System.out.println("-------------------------------------------------------------------");
+        for (Produto p : produtos) {
+            System.out.println(p);
+        }
+        System.out.println("-------------------------------------------------------------------");
+        System.out.println("Total: " + produtos.size() + " produto(s), ordenado por "
+                + coluna + (crescente ? " (crescente)." : " (decrescente)."));
+    }
+
+    /** Opcao 7 - EXTRA: relatorio de estoque (totais via COUNT/SUM). */
+    private static void relatorioEstoque() {
+        System.out.println();
+        System.out.println(">> RELATORIO DE ESTOQUE");
+        ProdutoDAO.ResumoEstoque r = DAO.relatorioEstoque();
+        System.out.println("-------------------------------------------------------------------");
+        System.out.println("Produtos cadastrados  : " + r.itens());
+        System.out.println("Unidades em estoque   : " + r.unidades());
+        System.out.printf("Valor total em estoque: R$ %.2f%n", r.valorTotal());
+        System.out.println("-------------------------------------------------------------------");
     }
 
     // ===== Utilitarios de leitura do teclado =====

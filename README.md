@@ -12,6 +12,11 @@ as 4 operações de um **CRUD** sobre a tabela `produto`.
 
 A conexão com o banco fica na classe `Conexao` (Aula 05).
 
+**Rotinas adicionais (extras)** no menu, além do CRUD obrigatório:
+- **5 – Buscar produto por nome** (consulta com `LIKE`)
+- **6 – Listar produtos ordenado** (por nome, preço ou quantidade; crescente/decrescente)
+- **7 – Relatório de estoque** (total de itens, unidades e valor total via `COUNT`/`SUM`)
+
 ## Estrutura
 
 ```

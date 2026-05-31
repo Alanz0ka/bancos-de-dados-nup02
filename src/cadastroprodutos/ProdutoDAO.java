@@ -112,4 +112,91 @@ public class ProdutoDAO {
         }
         return null;
     }
+
+    // ===================== EXTRAS (rotinas adicionais) =====================
+
+    /** EXTRA: busca produtos cujo nome contenha o termo informado (LIKE). */
+    public List<Produto> buscarPorNome(String termo) {
+        String sql = "SELECT id, nome, preco, quantidade, categoria FROM produto "
+                + "WHERE nome LIKE ? ORDER BY nome";
+        List<Produto> produtos = new ArrayList<>();
+        Connection conexao = Conexao.conectar();
+        try (PreparedStatement ps = conexao.prepareStatement(sql)) {
+            ps.setString(1, "%" + termo + "%");
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    produtos.add(new Produto(
+                            rs.getInt("id"),
+                            rs.getString("nome"),
+                            rs.getDouble("preco"),
+                            rs.getInt("quantidade"),
+                            rs.getString("categoria")));
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Erro ao buscar por nome: " + e.getMessage());
+        } finally {
+            Conexao.fechar(conexao);
+        }
+        return produtos;
+    }
+
+    /** EXTRA: lista os produtos ordenados por uma coluna (protegido contra SQL injection). */
+    public List<Produto> listarOrdenado(String coluna, boolean crescente) {
+        // So permite ordenar por colunas conhecidas (evita SQL injection no ORDER BY)
+        String col = switch (coluna) {
+            case "nome" -> "nome";
+            case "preco" -> "preco";
+            case "quantidade" -> "quantidade";
+            default -> "id";
+        };
+        String direcao = crescente ? "ASC" : "DESC";
+        String sql = "SELECT id, nome, preco, quantidade, categoria FROM produto "
+                + "ORDER BY " + col + " " + direcao;
+        List<Produto> produtos = new ArrayList<>();
+        Connection conexao = Conexao.conectar();
+        try (PreparedStatement ps = conexao.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                produtos.add(new Produto(
+                        rs.getInt("id"),
+                        rs.getString("nome"),
+                        rs.getDouble("preco"),
+                        rs.getInt("quantidade"),
+                        rs.getString("categoria")));
+            }
+        } catch (SQLException e) {
+            System.out.println("Erro ao listar ordenado: " + e.getMessage());
+        } finally {
+            Conexao.fechar(conexao);
+        }
+        return produtos;
+    }
+
+    /** EXTRA: resumo do estoque calculado no banco (COUNT e SUM). */
+    public ResumoEstoque relatorioEstoque() {
+        String sql = "SELECT COUNT(*) AS itens, "
+                + "COALESCE(SUM(quantidade), 0) AS unidades, "
+                + "COALESCE(SUM(preco * quantidade), 0) AS valor_total "
+                + "FROM produto";
+        Connection conexao = Conexao.conectar();
+        try (PreparedStatement ps = conexao.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return new ResumoEstoque(
+                        rs.getInt("itens"),
+                        rs.getInt("unidades"),
+                        rs.getDouble("valor_total"));
+            }
+        } catch (SQLException e) {
+            System.out.println("Erro ao gerar relatorio: " + e.getMessage());
+        } finally {
+            Conexao.fechar(conexao);
+        }
+        return new ResumoEstoque(0, 0, 0.0);
+    }
+
+    /** Resultado do relatorio de estoque (itens, unidades e valor total). */
+    public record ResumoEstoque(int itens, int unidades, double valorTotal) {
+    }
 }
