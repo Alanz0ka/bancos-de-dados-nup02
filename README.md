@@ -77,6 +77,13 @@ javac -cp "lib/mysql-connector-j-8.2.0.jar" -d out src/cadastroprodutos/*.java
 java -cp "out:lib/mysql-connector-j-8.2.0.jar" cadastroprodutos.CadastroProdutos
 ```
 
+### No IntelliJ IDEA (ou outra IDE)
+Ao rodar pela IDE é preciso ter o **driver JDBC no classpath do projeto**, senão ocorre o
+erro `ClassNotFoundException: com.mysql.cj.jdbc.Driver`. No IntelliJ: no painel **Project**,
+clique com o botão direito em `lib/mysql-connector-j-8.2.0.jar` → **"Add as Library…"** →
+**OK**, e então execute a classe `CadastroProdutos`. (Pelos scripts `compilar`/`executar`
+ou pela linha de comando o driver já é incluído automaticamente.)
+
 ## Requisitos
 - Java 8 ou superior (desenvolvido com Java 21)
 - MySQL 8.x
