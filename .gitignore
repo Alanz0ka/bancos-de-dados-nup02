@@ -8,5 +8,6 @@ config.properties
 
 # IDE / Sistema operacional
 .idea/
+*.iml
 *.iws
 .DS_Store
