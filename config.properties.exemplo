@@ -1,0 +1,10 @@
+# Copie este arquivo para "config.properties" e ajuste conforme o seu MySQL.
+# O arquivo config.properties NAO e versionado (esta no .gitignore).
+# Se ele nao existir, a aplicacao usa os valores padrao de Conexao.java
+# (localhost / root / loja).
+
+db.host=localhost
+db.porta=3306
+db.banco=loja
+db.usuario=root
+db.senha=root
